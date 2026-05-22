@@ -1,0 +1,205 @@
+{
+  "annotations": {"list": []},
+  "editable": true,
+  "fiscalYearStartMonth": 0,
+  "graphTooltip": 0,
+  "id": null,
+  "links": [],
+  "liveNow": false,
+  "panels": [
+    {
+      "type": "row",
+      "title": "Throughput",
+      "gridPos": {"h": 1, "w": 24, "x": 0, "y": 0},
+      "id": 100,
+      "collapsed": false,
+      "panels": []
+    },
+    {
+      "type": "stat",
+      "title": "Active runs",
+      "gridPos": {"h": 5, "w": 4, "x": 0, "y": 1},
+      "id": 1,
+      "datasource": {"type": "prometheus", "uid": "${DS_PROMETHEUS}"},
+      "targets": [{
+        "expr": "sum(gakudan_runs_started_total) - sum(gakudan_runs_stopped_total)",
+        "refId": "A"
+      }],
+      "options": {"colorMode": "value", "graphMode": "area", "textMode": "auto"}
+    },
+    {
+      "type": "timeseries",
+      "title": "Runs / minute",
+      "gridPos": {"h": 5, "w": 10, "x": 4, "y": 1},
+      "id": 2,
+      "datasource": {"type": "prometheus", "uid": "${DS_PROMETHEUS}"},
+      "targets": [{
+        "expr": "sum(rate(gakudan_runs_started_total[1m])) * 60",
+        "legendFormat": "started",
+        "refId": "A"
+      }, {
+        "expr": "sum(rate(gakudan_runs_stopped_total[1m])) * 60",
+        "legendFormat": "stopped",
+        "refId": "B"
+      }]
+    },
+    {
+      "type": "timeseries",
+      "title": "Turns / minute by agent",
+      "gridPos": {"h": 5, "w": 10, "x": 14, "y": 1},
+      "id": 3,
+      "datasource": {"type": "prometheus", "uid": "${DS_PROMETHEUS}"},
+      "targets": [{
+        "expr": "sum by (agent_id) (rate(gakudan_turns_total[1m])) * 60",
+        "legendFormat": "{{agent_id}}",
+        "refId": "A"
+      }]
+    },
+    {
+      "type": "row",
+      "title": "Cost",
+      "gridPos": {"h": 1, "w": 24, "x": 0, "y": 6},
+      "id": 101,
+      "collapsed": false,
+      "panels": []
+    },
+    {
+      "type": "timeseries",
+      "title": "Tokens / second by model",
+      "gridPos": {"h": 7, "w": 12, "x": 0, "y": 7},
+      "id": 4,
+      "datasource": {"type": "prometheus", "uid": "${DS_PROMETHEUS}"},
+      "targets": [{
+        "expr": "sum by (model) (rate(gakudan_llm_tokens_input_total[1m]))",
+        "legendFormat": "{{model}} in",
+        "refId": "A"
+      }, {
+        "expr": "sum by (model) (rate(gakudan_llm_tokens_output_total[1m]))",
+        "legendFormat": "{{model}} out",
+        "refId": "B"
+      }]
+    },
+    {
+      "type": "table",
+      "title": "Top models by output tokens (1h)",
+      "gridPos": {"h": 7, "w": 12, "x": 12, "y": 7},
+      "id": 5,
+      "datasource": {"type": "prometheus", "uid": "${DS_PROMETHEUS}"},
+      "targets": [{
+        "expr": "topk(10, sum by (model, backend) (increase(gakudan_llm_tokens_output_total[1h])))",
+        "format": "table",
+        "instant": true,
+        "refId": "A"
+      }]
+    },
+    {
+      "type": "row",
+      "title": "Latency",
+      "gridPos": {"h": 1, "w": 24, "x": 0, "y": 14},
+      "id": 102,
+      "collapsed": false,
+      "panels": []
+    },
+    {
+      "type": "timeseries",
+      "title": "LLM request duration (p50 / p95 / p99) by model",
+      "gridPos": {"h": 7, "w": 12, "x": 0, "y": 15},
+      "id": 6,
+      "datasource": {"type": "prometheus", "uid": "${DS_PROMETHEUS}"},
+      "targets": [{
+        "expr": "histogram_quantile(0.50, sum by (le, model) (rate(gakudan_llm_request_duration_seconds_bucket[5m])))",
+        "legendFormat": "{{model}} p50",
+        "refId": "A"
+      }, {
+        "expr": "histogram_quantile(0.95, sum by (le, model) (rate(gakudan_llm_request_duration_seconds_bucket[5m])))",
+        "legendFormat": "{{model}} p95",
+        "refId": "B"
+      }, {
+        "expr": "histogram_quantile(0.99, sum by (le, model) (rate(gakudan_llm_request_duration_seconds_bucket[5m])))",
+        "legendFormat": "{{model}} p99",
+        "refId": "C"
+      }]
+    },
+    {
+      "type": "timeseries",
+      "title": "Tool duration (p50 / p95) by tool",
+      "gridPos": {"h": 7, "w": 12, "x": 12, "y": 15},
+      "id": 7,
+      "datasource": {"type": "prometheus", "uid": "${DS_PROMETHEUS}"},
+      "targets": [{
+        "expr": "histogram_quantile(0.50, sum by (le, tool) (rate(gakudan_tool_run_duration_seconds_bucket[5m])))",
+        "legendFormat": "{{tool}} p50",
+        "refId": "A"
+      }, {
+        "expr": "histogram_quantile(0.95, sum by (le, tool) (rate(gakudan_tool_run_duration_seconds_bucket[5m])))",
+        "legendFormat": "{{tool}} p95",
+        "refId": "B"
+      }]
+    },
+    {
+      "type": "row",
+      "title": "Errors",
+      "gridPos": {"h": 1, "w": 24, "x": 0, "y": 22},
+      "id": 103,
+      "collapsed": false,
+      "panels": []
+    },
+    {
+      "type": "stat",
+      "title": "LLM error rate (5m)",
+      "gridPos": {"h": 5, "w": 6, "x": 0, "y": 23},
+      "id": 8,
+      "datasource": {"type": "prometheus", "uid": "${DS_PROMETHEUS}"},
+      "targets": [{
+        "expr": "sum(rate(gakudan_llm_requests_total{outcome=\"error\"}[5m])) / clamp_min(sum(rate(gakudan_llm_requests_total[5m])), 1e-9)",
+        "refId": "A"
+      }],
+      "options": {"colorMode": "value", "graphMode": "area", "textMode": "auto"},
+      "fieldConfig": {"defaults": {"unit": "percentunit"}}
+    },
+    {
+      "type": "stat",
+      "title": "Tool error rate (5m)",
+      "gridPos": {"h": 5, "w": 6, "x": 6, "y": 23},
+      "id": 9,
+      "datasource": {"type": "prometheus", "uid": "${DS_PROMETHEUS}"},
+      "targets": [{
+        "expr": "sum(rate(gakudan_tool_runs_total{outcome=\"error\"}[5m])) / clamp_min(sum(rate(gakudan_tool_runs_total[5m])), 1e-9)",
+        "refId": "A"
+      }],
+      "options": {"colorMode": "value", "graphMode": "area", "textMode": "auto"},
+      "fieldConfig": {"defaults": {"unit": "percentunit"}}
+    },
+    {
+      "type": "timeseries",
+      "title": "Failed turns / minute by agent",
+      "gridPos": {"h": 5, "w": 12, "x": 12, "y": 23},
+      "id": 10,
+      "datasource": {"type": "prometheus", "uid": "${DS_PROMETHEUS}"},
+      "targets": [{
+        "expr": "sum by (agent_id) (rate(gakudan_turns_total{outcome=\"failed\"}[1m])) * 60",
+        "legendFormat": "{{agent_id}}",
+        "refId": "A"
+      }]
+    }
+  ],
+  "refresh": "30s",
+  "schemaVersion": 39,
+  "tags": ["gakudan", "agents", "llm"],
+  "templating": {
+    "list": [{
+      "name": "DS_PROMETHEUS",
+      "type": "datasource",
+      "query": "prometheus",
+      "label": "Prometheus",
+      "hide": 0
+    }]
+  },
+  "time": {"from": "now-1h", "to": "now"},
+  "timepicker": {},
+  "timezone": "browser",
+  "title": "gakudan",
+  "uid": "gakudan-overview",
+  "version": 1,
+  "weekStart": ""
+}

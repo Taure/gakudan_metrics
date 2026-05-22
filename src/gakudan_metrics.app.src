@@ -1,0 +1,20 @@
+{application, gakudan_metrics, [
+    {description, "Prometheus exporter and Grafana dashboard for gakudan"},
+    {vsn, "git"},
+    {registered, [gakudan_metrics_sup]},
+    {mod, {gakudan_metrics_app, []}},
+    {applications, [
+        kernel,
+        stdlib,
+        telemetry,
+        prometheus,
+        prometheus_cowboy,
+        cowboy
+    ]},
+    {env, [
+        {auto_setup, true}
+    ]},
+    {modules, []},
+    {licenses, ["MIT"]},
+    {links, [{"GitHub", "https://github.com/Taure/gakudan_metrics"}]}
+]}.
