@@ -14,7 +14,7 @@ on:
 
 jobs:
   ci:
-    uses: Taure/erlang-ci/.github/workflows/ci.yml@v2.1.0
+    uses: Taure/erlang-ci/.github/workflows/ci.yml@v2.1.1
     permissions:
       contents: write
       pull-requests: write
@@ -24,6 +24,7 @@ jobs:
       enable-ex-doc: true
       enable-hank: true
       enable-audit: true
+      audit-ignores: GHSA-g2wm-735q-3f56
       enable-coverage: true
       enable-elp-lint: true
       enable-elp-eqwalize: false
