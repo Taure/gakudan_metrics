@@ -23,7 +23,7 @@ in the Prometheus core's own supervision; we do not own them.
 
 The listener supervisor is intentionally empty until the user explicitly
 calls `gakudan_metrics:start_listener/1,2`. Most users mount
-`gakudan_metrics_handler` on their existing Cowboy or Nova listener
+`prometheus_cowboy2_handler` on their existing Cowboy or Nova listener
 instead.
 
 ## Why a separate library
