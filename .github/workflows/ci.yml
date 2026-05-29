@@ -26,7 +26,9 @@ jobs:
       enable-audit: true
       audit-ignores: GHSA-g2wm-735q-3f56
       enable-coverage: true
-      enable-elp-lint: true
+      # ELP has no OTP 29 binary yet (matches the pillar repos); re-enable when
+      # WhatsApp/erlang-language-platform ships an OTP 29 build.
+      enable-elp-lint: false
       enable-elp-eqwalize: false
       enable-sbom: true
       enable-sbom-scan: true
