@@ -19,7 +19,7 @@ Point Prometheus at `:9568/metrics`. Import `priv/grafana/gakudan.json`.
 
 ```erlang
 Routes = [
-    {"/metrics", gakudan_metrics_handler, []}
+    {"/metrics", prometheus_cowboy2_handler, []}
     %% your other routes
 ],
 Dispatch = cowboy_router:compile([{'_', Routes}]),
